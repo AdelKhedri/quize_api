@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,18 +41,29 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt'
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',  # برای محدود کردن درخواست‌های ناشناس
-        'rest_framework.throttling.UserRateThrottle',  # برای محدود کردن درخواست‌های کاربران وارد شده
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/day',  # به‌طور مثال 5 درخواست در روز
-        'user': '100/day',  # 100 درخواست در روز
+        'anon': '10/h',
+        'user': '2000/h',
     }
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=4),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
+    # 'LEEWAY': 10,
+
+    'AUTH_HEADER_TYPES': ('Bearer',)
+}
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
