@@ -52,13 +52,18 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10/h',
         'user': '2000/h',
-    }
+    },
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=4),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
-    # 'LEEWAY': 10,
+    'LEEWAY': 10,
 
     'AUTH_HEADER_TYPES': ('Bearer',)
 }
