@@ -3,7 +3,7 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from .models import TestQuestion
+from .models import Category, TestQuestion
 
 
 class TestListCreateTestQuestionAPI(APITestCase):
@@ -80,7 +80,7 @@ class TestRetriveUpdateTestQuestionAPI(APITestCase):
             'creator': user,
             'point': 1.75
         }
-
+        TestQuestion.objects.create(**cls.question_data)
         cls.token = Token.objects.create(user=user).key
         cls.url = reverse('quize:test-question-retrive-update', kwargs={'pk': 1})
 
@@ -94,3 +94,33 @@ class TestRetriveUpdateTestQuestionAPI(APITestCase):
     def test_retrive_question(self):
         res = self.client.get(self.url, HTTP_AUTHORIZATION=f'Token {self.token}')
         self.assertEqual(json.loads(res.content)['text_question'], self.question_data['text_question'])
+
+
+class TestCategorysAPI(APITestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create_user(username='user1', password='password')
+        cls.token = Token.objects.create(user=user).key
+        cls.url = reverse('quize:categorys-list')
+        category_list = []
+
+        for num in range(53):
+            name = f'category{num}'
+            allow_quize_assignment = True if num%2 == 0 else False
+            category_list.append(Category(name=name, slug=name, allow_quize_assignment=allow_quize_assignment))
+        Category.objects.bulk_create(category_list)
+
+    def test_pagination(self):
+        res = self.client.get(self.url, HTTP_AUTHORIZATION = f'Token {self.token}')
+        data = json.loads(res.content)
+        categorys_per_page = len(data['results'])
+        total_categorys = data['count']
+        next_page = data['next']
+        self.assertEqual(total_categorys, 53)
+        self.assertEqual(categorys_per_page, 50)
+        self.assertIn('page=2', next_page)
+
+    def test_get_categorys(self):
+        res = self.client.get(self.url, HTTP_AUTHORIZATION = f'Token {self.token}')
+        self.assertEqual(json.loads(res.content)['results'][0]['name'], 'category52')

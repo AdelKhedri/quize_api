@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TestQuestion
+from .models import Category, TestQuestion
 
 
 class TestQuestionWithAnswerSerializer(serializers.ModelSerializer):
@@ -12,6 +12,7 @@ class TestQuestionWithAnswerSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class TestQuestionNoAnswerSerializer(TestQuestionWithAnswerSerializer):
-    class Meta(TestQuestionWithAnswerSerializer.Meta):
-        exclude = ['creator', 'correct_choise']
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
