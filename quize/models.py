@@ -2,6 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=200, verbose_name='نام')
+    slug = models.SlugField(unique=True, verbose_name='اسلاگ')
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='دسته بندی ریشه')
+    allow_quize_assignment = models.BooleanField(default=True, verbose_name='اجازه ارتباط آزمون با این دسته بندی')
+
+    class Meta:
+        verbose_name = 'دسته بندی'
+        verbose_name_plural = 'دسته بندی ها'
+        ordering = ['-id']
+
+
+    def __str__(self):
+        return self.name
+
+
 class TestQuestion(models.Model):
     choises_list = ((1, 1), (2, 2), (3, 3), (4, 4))
 
