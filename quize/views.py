@@ -27,15 +27,16 @@ class RetriveUpdateTestQuestionAPI(RetrieveUpdateAPIView):
 
 
 # Quiz
-class ListCreateTestQuiezeAPI(ListCreateAPIView):
+class ListCreateTestQuizAPI(ListCreateAPIView):
     serializer_class = TestQuizUpdateSerializer
     permission_classes = [IsAuthenticated, IsCreator]
     authentication_classes = [TokenAuthentication, JWTAuthentication]
+    queryset = TestQuiz.objects.all()
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = QuizFilter
 
-    def get_queryset(self):
-        return TestQuiz.objects.filter(creator = self.request.user)
+    # def get_queryset(self):
+    #     return TestQuiz.objects.filter(creator = self.request.user)
 
 
 class RetriveUpdateTestQuizAPI(RetrieveUpdateAPIView):
@@ -65,3 +66,16 @@ class ListCategorysAPI(ListAPIView):
     authentication_classes = [TokenAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Category.objects.all()
+
+
+class ListAllQuizAPI(ListAPIView):
+    serializer_class = TestQuizUpdateSerializer
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = TestQuiz.objects.all()
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = QuizFilter
+
+# TODO: CreateUserAnswer
+# TODO: See quiz result
+# TODO: See all Quiz signin
