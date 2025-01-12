@@ -1,8 +1,21 @@
 import django_filters
-from .models import TestQuize
+from django_filters import rest_framework as filters
+from .models import TestQuiz
 
 
-class QuizeFilter(django_filters.FilterSet):
+class QuizFilter(django_filters.FilterSet):
+    max_time = filters.TimeFilter(field_name='time', lookup_expr='gte', label='max')
+    min_time = filters.TimeFilter(field_name='time', lookup_expr='lte')
+    exact_time = filters.TimeFilter(field_name='time', lookup_expr='exact')
+
     class Meta:
-        model = TestQuize
-        fields = ['name', 'categorys', 'start_at', 'end_at', 'creator', 'created_at']
+        model = TestQuiz
+        fields = {
+            'name': ['contains', 'startswith',],
+            'questions': ['exact'],
+            'categorys': ['exact'],
+            'time': ['exact', 'gte', 'lte'],
+            'end_at': ['gte', 'lte'],
+            'start_at': ['gte', 'lte'],
+            'created_at': ['gte', 'lte'],
+        }

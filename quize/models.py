@@ -6,7 +6,7 @@ class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name='نام')
     slug = models.SlugField(unique=True, verbose_name='اسلاگ')
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='دسته بندی ریشه')
-    allow_quize_assignment = models.BooleanField(default=True, verbose_name='اجازه ارتباط آزمون با این دسته بندی')
+    allow_quiz_assignment = models.BooleanField(default=True, verbose_name='اجازه ارتباط آزمون با این دسته بندی')
 
     class Meta:
         verbose_name = 'دسته بندی'
@@ -39,3 +39,29 @@ class TestQuestion(models.Model):
 
     def __str__(self):
         return 'Qid: {}-- U: {}'.format(self.id, self.creator.__str__())
+
+
+class BaseQuiz(models.Model):
+    name = models.CharField(max_length=200, verbose_name='نام آزمون')
+    poster = models.ImageField(upload_to='images/test_quiz/poster/', blank=True, verbose_name='پوستر آزمون')
+    categorys = models.ManyToManyField(Category, blank = True, verbose_name='دسته بندی')
+    time = models.TimeField(verbose_name='زمان آزمون')
+    start_at = models.DateTimeField(verbose_name = 'زمان شروع')
+    end_at = models.DateTimeField(verbose_name = 'زمان پایان')
+    creator = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name = 'سازنده')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان ساخت')
+
+    class Meta:
+        abstract = True
+
+
+class TestQuiz(BaseQuiz):
+    questions = models.ManyToManyField(TestQuestion, verbose_name='سوالات')
+
+    class Meta:
+        verbose_name = 'آزمون تستی'
+        verbose_name_plural = 'آزمون های تستی'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Q: {self.name}-- U: {self.creator.__str__()}'
