@@ -65,3 +65,37 @@ class TestQuiz(BaseQuiz):
 
     def __str__(self):
         return f'Q: {self.name}-- U: {self.creator.__str__()}'
+
+
+class UserResponseTestQuiz(models.Model):
+    choises_list = ((1, 1), (2, 2), (3, 3), (4, 4))
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='کاربر')
+    quiz = models.ForeignKey(TestQuiz, on_delete=models.CASCADE, verbose_name='آزمون')
+    question = models.ForeignKey(TestQuestion, on_delete=models.CASCADE, verbose_name='سوال')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان ساخت')
+    choise = models.IntegerField(choices=choises_list, verbose_name='انتخاب کاربر')
+    point = models.DecimalField(max_digits=4, decimal_places=2, verbose_name='نمره')
+
+    class Meta:
+        verbose_name = 'پاسخ سوال آزمون تستی'
+        verbose_name_plural = 'پاسخ سوالات آزمون تستی'
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'{self.user}: {self.quiz.name}: {self.question.id}'
+
+
+class UserStartedQuiz(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='کاربر')
+    quiz = models.ForeignKey(TestQuiz, on_delete=models.CASCADE, verbose_name='آزمون')
+    started = models.DateTimeField(auto_now_add=True, verbose_name='زمان شروع')
+    total_point = models.DecimalField(default=0, max_digits=4, decimal_places=2, verbose_name='نمره کلی')
+
+    class Meta:
+        verbose_name = ''
+        verbose_name_plural = ''
+        ordering = ['started']
+
+    def __str__(self):
+        return self.quiz.__str__()
