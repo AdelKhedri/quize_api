@@ -1,5 +1,8 @@
+from datetime import timedelta
+from decimal import Decimal
 from rest_framework import serializers
-from .models import Category, TestQuestion, TestQuiz
+from .models import Category, TestQuestion, TestQuiz, UserResponseTestQuiz, UserStartedQuiz
+from django.utils import timezone
 
 
 class TestQuestionWithAnswerSerializer(serializers.ModelSerializer):
@@ -74,3 +77,39 @@ class TestQuizQuestionWithAnswerSerializer(TestQuizQuestionNoAnswerSerializer):
     ''' ### With question object with answer for **Creator** '''
 
     questions = TestQuestionWithAnswerSerializer(many = True)
+
+
+class UserResponseTestQuizSerializer(serializers.Serializer):
+    choises = ((1, 1), (2, 2), (3, 3), (4, 4))
+
+    question = serializers.PrimaryKeyRelatedField(queryset = TestQuestion.objects.all())
+    quiz = serializers.PrimaryKeyRelatedField(queryset = TestQuiz.objects.all())
+    choise = serializers.ChoiceField(choices=choises)
+
+    def save(self, **kwargs):
+        quiz = self.validated_data.get('quiz', None)
+        question = self.validated_data.get('question', None)
+        choise = self.validated_data.get('choise', None)
+        user = self.context['request'].user
+
+        if question and choise and quiz:
+            if quiz.start_at > timezone.now():
+                raise serializers.ValidationError({'quiz': 'quiz is not started.'})
+            elif quiz.end_at < timezone.now():
+                raise serializers.ValidationError({'quiz': 'quiz is ended.'})
+            elif question not in quiz.questions.all():
+                raise serializers.ValidationError({'question': 'only questions that in quiz.'})
+            else:
+                start_quiz, created = UserStartedQuiz.objects.get_or_create(user=user, quiz=quiz)
+                if timezone.now() > start_quiz.started + timedelta(hours=quiz.time.hour, minutes=quiz.time.minute, seconds=quiz.time.second):
+                    raise serializers.ValidationError({'quiz': 'time to complete quiz is ended.'})
+
+            ques = UserResponseTestQuiz.objects.filter(user=user, quiz=quiz, question=question)
+            if ques.exists():
+                ques.update(choise=choise)
+                return ques.first()
+            else:
+                point = question.point if choise == question.correct_choise else 0
+                start_quiz.total_point = start_quiz.total_point + Decimal(point)
+                start_quiz.save()
+                return UserResponseTestQuiz.objects.create(user=user, question=question, quiz=quiz, choise=choise, point=point)
