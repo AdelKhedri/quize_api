@@ -1,11 +1,12 @@
 from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView, RetrieveUpdateAPIView, RetrieveAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsCreator
+from .permissions import IsCreator, IsParticipant
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import (TestQuestionWithAnswerSerializer, TestQuizUpdateSerializer, TestQuizQuestionNoAnswerSerializer, 
-            TestQuizQuestionWithAnswerSerializer, CategorySerializer, UserResponseTestQuizSerializer, UserStartedQuizNoAnswerSerializer,)
-from .models import Category, TestQuestion, TestQuiz, UserStartedQuiz
+            TestQuizQuestionWithAnswerSerializer, CategorySerializer, UserResponseTestQuizSerializer, UserStartedQuizNoAnswerSerializer,
+            UserStartedQuizWithAnswerSerializer)
+from .models import Category, TestQuestion, TestQuiz, UserStartedQuiz, UserResponseTestQuiz
 from django.utils import timezone
 from django_filters import rest_framework as filters
 from django.db.models import F
@@ -92,3 +93,14 @@ class AllUserStartedQuizAPI(ListAPIView):
 
     def get_queryset(self):
         return UserStartedQuiz.objects.filter(user=self.request.user, quiz__end_at__lt=timezone.now())
+
+
+class UserStartedQuizDetailAPI(RetrieveAPIView):
+    serializer_class = UserStartedQuizWithAnswerSerializer
+    permission_classes = [IsAuthenticated, IsParticipant]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
+    queryset = UserStartedQuiz.objects.all()
+
+    def get_queryset(self):
+        print(UserStartedQuiz.objects.all())
+        return super().get_queryset()

@@ -122,3 +122,11 @@ class UserStartedQuizNoAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserStartedQuiz
         exclude = ['user']
+
+
+class UserStartedQuizWithAnswerSerializer(serializers.ModelSerializer):
+    quiz = TestQuizQuestionWithAnswerSerializer()
+
+    class Meta:
+        model = UserStartedQuiz
+        exclude = ['user']
