@@ -5,11 +5,10 @@ from .permissions import IsCreator, IsParticipant
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import (TestQuestionWithAnswerSerializer, TestQuizUpdateSerializer, TestQuizQuestionNoAnswerSerializer, 
             TestQuizQuestionWithAnswerSerializer, CategorySerializer, UserResponseTestQuizSerializer, UserStartedQuizNoAnswerSerializer,
-            UserStartedQuizWithAnswerSerializer)
+            UserStartedQuizWithAnswerSerializer, UserResponseTestQuiz)
 from .models import Category, TestQuestion, TestQuiz, UserStartedQuiz, UserResponseTestQuiz
 from django.utils import timezone
 from django_filters import rest_framework as filters
-from django.db.models import F
 from .filters import QuizFilter
 
 
@@ -102,5 +101,11 @@ class UserStartedQuizDetailAPI(RetrieveAPIView):
     queryset = UserStartedQuiz.objects.all()
 
     def get_queryset(self):
-        print(UserStartedQuiz.objects.all())
         return super().get_queryset()
+
+
+class QuizDetailListUserResponseTestQuizAPI(ListAPIView):
+    serializer_class = UserResponseTestQuizSerializer
+    permission_classes = [IsAuthenticated, IsParticipant]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
+    queryset = UserResponseTestQuiz.objects.all()
