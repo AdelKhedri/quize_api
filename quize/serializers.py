@@ -130,3 +130,10 @@ class UserStartedQuizWithAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserStartedQuiz
         exclude = ['user']
+
+
+class UserResponseTestQuizSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserResponseTestQuiz
+        exclude = ['user']
