@@ -113,3 +113,12 @@ class UserResponseTestQuizSerializer(serializers.Serializer):
                 start_quiz.total_point = start_quiz.total_point + Decimal(point)
                 start_quiz.save()
                 return UserResponseTestQuiz.objects.create(user=user, question=question, quiz=quiz, choise=choise, point=point)
+
+
+class UserStartedQuizNoAnswerSerializer(serializers.ModelSerializer):
+    quiz = TestQuizUpdateSerializer()
+    details = serializers.HyperlinkedIdentityField(view_name='quiz:quiz-result-detail')
+
+    class Meta:
+        model = UserStartedQuiz
+        exclude = ['user']

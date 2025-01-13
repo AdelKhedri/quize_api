@@ -93,8 +93,8 @@ class UserStartedQuiz(models.Model):
     total_point = models.DecimalField(default=0, max_digits=4, decimal_places=2, verbose_name='نمره کلی')
 
     class Meta:
-        verbose_name = ''
-        verbose_name_plural = ''
+        verbose_name = 'آزمون داده شده'
+        verbose_name_plural = 'آزمون های داده شده'
         ordering = ['started']
 
     def __str__(self):
