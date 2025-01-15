@@ -1,0 +1,13 @@
+site_name: My Docs
+markdown_extensions:
+  - toc:
+      # baselevel: 1
+nav:
+  - Home: index.md
+  - Steps: steps.md
+  - Auth: auth.md
+  - Categorys: category.md
+  - Question: 
+    - Management: question/management.md
+
+theme: readthedocs
